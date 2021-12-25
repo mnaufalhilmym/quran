@@ -6,7 +6,15 @@
 
 	let mounted = false;
 
-	let windowProps = { initW: 0, w: 0, h: 0, col: 0, initPointer: { x: 0, y: 0 }, fsChange: false };
+	let windowProps = {
+		initW: 0,
+		w: 0,
+		h: 0,
+		col: 0,
+		initPointer: { x: 0, y: 0 },
+		fs: false,
+		fsChange: false
+	};
 
 	let pageProps = {
 		rightEl: { scrollWidth: 0, scrollHeight: 0 },
@@ -76,6 +84,11 @@
 	function setScreenSize() {
 		windowProps.w = innerWidth;
 		windowProps.h = innerHeight;
+		if (document.fullscreenElement) {
+			windowProps.fs = true;
+		} else {
+			windowProps.fs = false;
+		}
 	}
 
 	async function getJuzData(juz?: string) {
@@ -833,8 +846,8 @@
 					}
 				}}
 			>
-				{#if document.fullscreenElement}
-					close_fullscreen
+				{#if windowProps.fs}
+					fullscreen_exit
 				{:else}
 					fullscreen
 				{/if}
