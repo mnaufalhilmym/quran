@@ -6,7 +6,7 @@
 
 	let mounted = false;
 
-	let windowProps = { initW: 0, w: 0, h: 0, col: 0, initPointer: { x: 0 }, fsChange: false };
+	let windowProps = { initW: 0, w: 0, h: 0, col: 0, initPointer: { x: 0, y: 0 }, fsChange: false };
 
 	let pageProps = {
 		rightEl: { scrollWidth: 0, scrollHeight: 0 },
@@ -486,37 +486,56 @@
 
 	function startDrag(event: TouchEvent | MouseEvent, type: string) {
 		if (!(modal.top || modal.bottom || pageProps.showNav) && innerWidth >= windowProps.initW) {
-			function detect() {
+			function detect(axis: string) {
 				switch (type) {
 					case 'touch':
-						return (event as TouchEvent).changedTouches[0].clientX;
+						if (axis === 'x') {
+							return (event as TouchEvent).changedTouches[0].clientX;
+						} else if (axis === 'y') {
+							return (event as TouchEvent).changedTouches[0].clientY;
+						}
 					case 'mouse':
-						return (event as MouseEvent).clientX;
+						if (axis === 'x') {
+							return (event as MouseEvent).clientX;
+						} else if (axis === 'y') {
+							return (event as MouseEvent).clientY;
+						}
 				}
 			}
-			windowProps.initPointer.x = detect();
+			windowProps.initPointer = { x: detect('x'), y: detect('y') };
 		}
 	}
 
 	function endDrag(event: TouchEvent | MouseEvent, type: string) {
 		if (!(modal.top || modal.bottom || pageProps.showNav) && innerWidth >= windowProps.initW) {
-			function detect() {
+			function detect(axis: string) {
 				switch (type) {
 					case 'touch':
-						return (event as TouchEvent).changedTouches[0].clientX;
+						if (axis === 'x') {
+							return (event as TouchEvent).changedTouches[0].clientX;
+						} else if (axis === 'y') {
+							return (event as TouchEvent).changedTouches[0].clientY;
+						}
 					case 'mouse':
-						return (event as MouseEvent).clientX;
+						if (axis === 'x') {
+							return (event as MouseEvent).clientX;
+						} else if (axis === 'y') {
+							return (event as MouseEvent).clientY;
+						}
 				}
 			}
 			const diff = {
-				endX: windowProps.initPointer.x - detect()
+				endX: windowProps.initPointer.x - detect('x'),
+				endY: windowProps.initPointer.y - detect('y')
 			};
-			if (diff.endX > 50) {
-				changePage('back');
-			} else if (diff.endX < -50) {
-				changePage('next');
+			if (Math.abs(diff.endX) > Math.abs(diff.endY)) {
+				if (diff.endX > 75) {
+					changePage('back');
+				} else if (diff.endX < -75) {
+					changePage('next');
+				}
 			}
-			windowProps.initPointer.x = 0;
+			windowProps.initPointer = { x: 0, y: 0 };
 		}
 	}
 </script>
